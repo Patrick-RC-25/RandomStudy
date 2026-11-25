@@ -3,9 +3,6 @@ GO
 USE RandomStudyDB;
 GO
 
-/* Script completo proporcionado para CarlitoApp / RandomStudyDB */
-/* Ejecutar en SSMS de una vez o por lotes según GO */
-
 CREATE TABLE dbo.TipoEvaluacion
 (
     idTipoEvaluacion  TINYINT IDENTITY(1,1) NOT NULL,
@@ -176,7 +173,7 @@ CREATE TABLE dbo.Tarea
         ON DELETE CASCADE,
     CONSTRAINT FK_Tarea_Curso
         FOREIGN KEY (idCurso) REFERENCES dbo.Curso(idCurso)
-        ON DELETE SET NULL,
+        ON DELETE NO ACTION,
     CONSTRAINT CK_Tarea_Prioridad CHECK (prioridad IN ('baja', 'media', 'alta')),
     CONSTRAINT CK_Tarea_Estado
         CHECK (estado IN ('pendiente', 'en_progreso', 'completada', 'cancelada'))
@@ -203,10 +200,10 @@ CREATE TABLE dbo.SesionEstudio
         ON DELETE CASCADE,
     CONSTRAINT FK_SesionEstudio_Curso
         FOREIGN KEY (idCurso) REFERENCES dbo.Curso(idCurso)
-        ON DELETE SET NULL,
+        ON DELETE NO ACTION,
     CONSTRAINT FK_SesionEstudio_Tarea
         FOREIGN KEY (idTarea) REFERENCES dbo.Tarea(idTarea)
-        ON DELETE SET NULL,
+        ON DELETE NO ACTION, 
     CONSTRAINT CK_SesionEstudio_FechasProgramadas
         CHECK (fechaFinProgramada > fechaInicioProgramada),
     CONSTRAINT CK_SesionEstudio_Estado
@@ -235,7 +232,7 @@ CREATE TABLE dbo.ObjetivoAcademico
         ON DELETE CASCADE,
     CONSTRAINT FK_ObjetivoAcademico_Curso
         FOREIGN KEY (idCurso) REFERENCES dbo.Curso(idCurso)
-        ON DELETE SET NULL,
+        ON DELETE NO ACTION,
     CONSTRAINT CK_ObjetivoAcademico_Progreso CHECK (progreso >= 0 AND progreso <= 100),
     CONSTRAINT CK_ObjetivoAcademico_Estado
         CHECK (estado IN ('pendiente', 'en_progreso', 'completado', 'cancelado'))
@@ -262,10 +259,10 @@ CREATE TABLE dbo.Alerta
         ON DELETE CASCADE,
     CONSTRAINT FK_Alerta_Curso
         FOREIGN KEY (idCurso) REFERENCES dbo.Curso(idCurso)
-        ON DELETE SET NULL,
+        ON DELETE NO ACTION, 
     CONSTRAINT FK_Alerta_Tarea
         FOREIGN KEY (idTarea) REFERENCES dbo.Tarea(idTarea)
-        ON DELETE SET NULL,
+        ON DELETE NO ACTION,
     CONSTRAINT FK_Alerta_Tipo
         FOREIGN KEY (idTipoAlerta) REFERENCES dbo.TipoAlerta(idTipoAlerta)
 );
