@@ -3,6 +3,7 @@ GO
 USE RandomStudyDB;
 GO
 
+
 CREATE TABLE dbo.TipoEvaluacion
 (
     idTipoEvaluacion  TINYINT IDENTITY(1,1) NOT NULL,
@@ -173,7 +174,7 @@ CREATE TABLE dbo.Tarea
         ON DELETE CASCADE,
     CONSTRAINT FK_Tarea_Curso
         FOREIGN KEY (idCurso) REFERENCES dbo.Curso(idCurso)
-        ON DELETE NO ACTION,
+        ON DELETE NO ACTION, 
     CONSTRAINT CK_Tarea_Prioridad CHECK (prioridad IN ('baja', 'media', 'alta')),
     CONSTRAINT CK_Tarea_Estado
         CHECK (estado IN ('pendiente', 'en_progreso', 'completada', 'cancelada'))
@@ -200,7 +201,7 @@ CREATE TABLE dbo.SesionEstudio
         ON DELETE CASCADE,
     CONSTRAINT FK_SesionEstudio_Curso
         FOREIGN KEY (idCurso) REFERENCES dbo.Curso(idCurso)
-        ON DELETE NO ACTION,
+        ON DELETE NO ACTION, 
     CONSTRAINT FK_SesionEstudio_Tarea
         FOREIGN KEY (idTarea) REFERENCES dbo.Tarea(idTarea)
         ON DELETE NO ACTION, 
@@ -232,7 +233,7 @@ CREATE TABLE dbo.ObjetivoAcademico
         ON DELETE CASCADE,
     CONSTRAINT FK_ObjetivoAcademico_Curso
         FOREIGN KEY (idCurso) REFERENCES dbo.Curso(idCurso)
-        ON DELETE NO ACTION,
+        ON DELETE NO ACTION, 
     CONSTRAINT CK_ObjetivoAcademico_Progreso CHECK (progreso >= 0 AND progreso <= 100),
     CONSTRAINT CK_ObjetivoAcademico_Estado
         CHECK (estado IN ('pendiente', 'en_progreso', 'completado', 'cancelado'))
@@ -259,13 +260,46 @@ CREATE TABLE dbo.Alerta
         ON DELETE CASCADE,
     CONSTRAINT FK_Alerta_Curso
         FOREIGN KEY (idCurso) REFERENCES dbo.Curso(idCurso)
-        ON DELETE NO ACTION, 
+        ON DELETE NO ACTION,
     CONSTRAINT FK_Alerta_Tarea
         FOREIGN KEY (idTarea) REFERENCES dbo.Tarea(idTarea)
-        ON DELETE NO ACTION,
+        ON DELETE NO ACTION, 
     CONSTRAINT FK_Alerta_Tipo
         FOREIGN KEY (idTipoAlerta) REFERENCES dbo.TipoAlerta(idTipoAlerta)
 );
+GO
+
+IF COL_LENGTH('dbo.Tarea', 'idObjetivo') IS NULL
+BEGIN
+    ALTER TABLE dbo.Tarea
+    ADD idObjetivo INT NULL;
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.foreign_keys
+    WHERE name = 'FK_Tarea_Objetivo'
+      AND parent_object_id = OBJECT_ID('dbo.Tarea')
+)
+BEGIN
+    ALTER TABLE dbo.Tarea
+    ADD CONSTRAINT FK_Tarea_Objetivo
+    FOREIGN KEY (idObjetivo)
+    REFERENCES dbo.ObjetivoAcademico(idObjetivo);
+END;
+GO
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.indexes
+    WHERE name = 'IX_Tarea_idObjetivo_estado'
+      AND object_id = OBJECT_ID('dbo.Tarea')
+)
+BEGIN
+    CREATE INDEX IX_Tarea_idObjetivo_estado
+    ON dbo.Tarea(idObjetivo, estado);
+END;
 GO
 
 CREATE OR ALTER VIEW dbo.vw_PromedioCurso
