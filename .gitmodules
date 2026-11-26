@@ -1,0 +1,6 @@
+[submodule "backend"]
+	path = backend
+	url = https://github.com/Patrick-RC-25/backend_SistemaWeb.git
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/Patrick-RC-25/frontend_SistemaWeb.git
